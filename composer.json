@@ -1,0 +1,47 @@
+{
+    "name": "crwlr/package-template",
+    "description": "Template repository for new crwlr packages.",
+    "keywords": [
+        "crwlr"
+    ],
+    "homepage": "https://www.crwlr.software/packages/...",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Christian Olear",
+            "homepage": "https://www.otsch.codes",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/crwlrsoft/.../issues",
+        "source": "https://github.com/crwlrsoft/...",
+        "docs": "https://www.crwlr.software/packages/..."
+    },
+    "autoload": {
+        "psr-4": {
+            "Crwlr\\PackageTemplate\\": "src/"
+        }
+    },
+    "require": {
+        "php": "^8.0"
+    },
+    "require-dev": {
+        "pestphp/pest": "^1.22",
+        "phpstan/phpstan": "^1.8",
+        "friendsofphp/php-cs-fixer": "^3.11"
+    },
+    "scripts": {
+        "test": "@php vendor/bin/pest",
+        "cs": "@php vendor/bin/php-cs-fixer fix -v --dry-run",
+        "cs-fix": "@php vendor/bin/php-cs-fixer fix -v",
+        "stan": "@php vendor/bin/phpstan analyse -c phpstan.neon",
+        "add-git-hooks": "@php bin/add-git-hooks"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}
