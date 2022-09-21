@@ -1,10 +1,14 @@
 <p align="center"><a href="https://www.crwlr.software" target="_blank"><img src="https://github.com/crwlrsoft/graphics/blob/eee6cf48ee491b538d11b9acd7ee71fbcdbe3a09/crwlr-logo.png" alt="crwlr.software logo" width="260"></a></p>
 
-# Crwlr Package Template
+# schema.org Structured Data Extraction
 
-This is the starting point for new crwlr packages. After checkout, you should at least customize the following things:
+This library helps to extract schema.org structured data in JSON-LD format from HTML documents.
+It tries to find JavaScript tags in HTML containing JSON-LD objects, getting the data and populating instances of the equivalent classes from [spatie's schema-org package](https://github.com/spatie/schema-org). Shout-out to the awesome guys at spatie!
 
-- `composer.json`: name, description, keywords, homepage, authors, support (issues, source, docs), autoload path.
-- Adapt URLs to file issues in `CONTRIBUTING.md`.
-- Remove `ExampleClass` and `ExampleTest` from `src` and `test` and start adding your actual code instead.
-- Rewrite the content of this file.
+## Documentation
+
+You can find the documentation at [crwlr.software](https://www.crwlr.software/packages/schema-org/getting-started).
+
+## Contributing
+
+If you consider contributing something to this package, read the [contribution guide (CONTRIBUTING.md)](CONTRIBUTING.md).

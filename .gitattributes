@@ -1,5 +1,6 @@
 .github export-ignore
 bin/add-git-hooks export-ignore
+bin/generate-type-list export-ignore
 git-hooks export-ignore
 tests export-ignore
 .editorconfig export-ignore

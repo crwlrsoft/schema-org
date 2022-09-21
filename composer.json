@@ -1,10 +1,16 @@
 {
-    "name": "crwlr/package-template",
-    "description": "Template repository for new crwlr packages.",
+    "name": "crwlr/schema-org",
+    "description": "Extract schema.org structured data from HTML documents.",
     "keywords": [
-        "crwlr"
+        "crwlr",
+        "schema.org",
+        "schema",
+        "org",
+        "structured",
+        "data",
+        "json-ld"
     ],
-    "homepage": "https://www.crwlr.software/packages/...",
+    "homepage": "https://www.crwlr.software/packages/schema-org",
     "type": "library",
     "license": "MIT",
     "authors": [
@@ -15,17 +21,24 @@
         }
     ],
     "support": {
-        "issues": "https://github.com/crwlrsoft/.../issues",
-        "source": "https://github.com/crwlrsoft/...",
-        "docs": "https://www.crwlr.software/packages/..."
+        "issues": "https://github.com/crwlrsoft/schema-org/issues",
+        "source": "https://github.com/crwlrsoft/schema-org",
+        "docs": "https://www.crwlr.software/packages/schema-org"
     },
     "autoload": {
         "psr-4": {
-            "Crwlr\\PackageTemplate\\": "src/"
+            "Crwlr\\SchemaOrg\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
         }
     },
     "require": {
-        "php": "^8.0"
+        "php": "^8.0",
+        "spatie/schema-org": "~3.11.0",
+        "symfony/dom-crawler": "^6.1"
     },
     "require-dev": {
         "pestphp/pest": "^1.22",
@@ -37,7 +50,8 @@
         "cs": "@php vendor/bin/php-cs-fixer fix -v --dry-run",
         "cs-fix": "@php vendor/bin/php-cs-fixer fix -v",
         "stan": "@php vendor/bin/phpstan analyse -c phpstan.neon",
-        "add-git-hooks": "@php bin/add-git-hooks"
+        "add-git-hooks": "@php bin/add-git-hooks",
+        "generate-type-list": "@php bin/generate-type-list"
     },
     "config": {
         "allow-plugins": {

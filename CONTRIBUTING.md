@@ -6,7 +6,7 @@ this package. So first off: Awesome! 👍🤘
 ## Bugs
 
 In case you encounter any bugs please
-[file an issue](https://github.com/crwlrsoft/.../issues/new).
+[file an issue](https://github.com/crwlrsoft/schema-org/issues/new).
 Describe the issue as well as you can and provide an example to
 reproduce it.  
 Maybe you're not 100 percent sure whether what you've discovered

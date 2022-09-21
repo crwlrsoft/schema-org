@@ -1,0 +1,12 @@
+#!/usr/bin/env php
+<?php
+
+use Crwlr\SchemaOrg\TypeListGenerator;
+
+include __DIR__ . '/../vendor/autoload.php';
+
+$generator = new TypeListGenerator();
+
+$generator->generate();
+
+echo "Type list generated" . PHP_EOL;
