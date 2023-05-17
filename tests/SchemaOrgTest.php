@@ -3,6 +3,7 @@
 namespace Tests;
 
 use Crwlr\SchemaOrg\SchemaOrg;
+use Psr\Log\LoggerInterface;
 use Spatie\SchemaOrg\Article;
 use Spatie\SchemaOrg\FAQPage;
 use Spatie\SchemaOrg\JobPosting;
@@ -155,4 +156,117 @@ it('also converts child schema.org objects to spatie class instances', function 
     expect($schemaOrgObjects[0]->getProperty('publisher'))->toBeInstanceOf(Organization::class);
 
     expect($schemaOrgObjects[0]->getProperty('publisher')->getProperty('name'))->toBe('Some Organization, Inc.');
+});
+
+test('there is no error if a json-ld script block contains an invalid JSON string', function () {
+    $html = <<<HTML
+        <!DOCTYPE html>
+        <html lang="de-AT">
+        <head>
+        <title>Some Article</title>
+        </head>
+        <body>
+        <h1>Some Article</h1>
+        <h2>This is some article about something.</h2>
+        <script type="application/ld+json">
+        {
+            "@context": "https:\/\/schema.org",
+            "@type": "Article",
+            name: Some Article,
+            url: https://de.example.org/articles/some,
+        ]
+        </script>
+        </body>
+        </html>
+        HTML;
+
+    $schemaOrgObjects = SchemaOrg::fromHtml($html);
+
+    expect($schemaOrgObjects)->toBeEmpty();
+});
+
+test('you can pass it a PSR-3 LoggerInterface and it will log an error message for invalid JSON string', function () {
+    $scriptBlockContent = <<<INVALIDJSON
+        {
+            "@context": "https:\/\/schema.org",
+            "@type": "Article",
+            name: Some Article,
+            url: https://de.example.org/articles/some,
+        ]
+        INVALIDJSON;
+
+    $html = <<<HTML
+        <!DOCTYPE html>
+        <html lang="de-AT">
+        <head>
+        <title>Some Article</title>
+        </head>
+        <body>
+        <h1>Some Article</h1>
+        <h2>This is some article about something.</h2>
+        <script type="application/ld+json">{$scriptBlockContent}</script>
+        </body>
+        </html>
+        HTML;
+
+    $logger = new class () implements LoggerInterface {
+        /**
+         * @var array<array<string|string[]>>
+         */
+        public array $messages = [];
+
+        public function emergency(\Stringable|string $message, array $context = []): void
+        {
+            $this->log('emergency', $message, $context);
+        }
+
+        public function alert(\Stringable|string $message, array $context = []): void
+        {
+            $this->log('alert', $message, $context);
+        }
+
+        public function critical(\Stringable|string $message, array $context = []): void
+        {
+            $this->log('critical', $message, $context);
+        }
+
+        public function error(\Stringable|string $message, array $context = []): void
+        {
+            $this->log('error', $message, $context);
+        }
+
+        public function warning(\Stringable|string $message, array $context = []): void
+        {
+            $this->log('warning', $message, $context);
+        }
+
+        public function notice(\Stringable|string $message, array $context = []): void
+        {
+            $this->log('notice', $message, $context);
+        }
+
+        public function info(\Stringable|string $message, array $context = []): void
+        {
+            $this->log('info', $message, $context);
+        }
+
+        public function debug(\Stringable|string $message, array $context = []): void
+        {
+            $this->log('debug', $message, $context);
+        }
+
+        public function log($level, \Stringable|string $message, array $context = []): void
+        {
+            $this->messages[] = ['level' => $level, 'message' => $message, 'context' => $context];
+        }
+    };
+
+    SchemaOrg::fromHtml($html, $logger);
+
+    expect($logger->messages[0])->toBe([
+        'level' => 'warning',
+        'message' => 'Failed to parse content of JSON-LD script block as JSON: { "@context": "https:\/\/schema.org", ' .
+            '"@type": "Article", name: Some Article, url: https://de.exampl',
+        'context' => [],
+    ]);
 });
