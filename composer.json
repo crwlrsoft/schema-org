@@ -38,7 +38,7 @@
     "require": {
         "php": "^8.0",
         "spatie/schema-org": "~3.11.0",
-        "symfony/dom-crawler": "^6.1",
+        "symfony/dom-crawler": "^6.0",
         "crwlr/utils": "^1.0",
         "psr/log": "^2.0|^3.0"
     },
