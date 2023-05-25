@@ -185,6 +185,31 @@ test('there is no error if a json-ld script block contains an invalid JSON strin
     expect($schemaOrgObjects)->toBeEmpty();
 });
 
+it('returns null if the schema.org object doesn\'t have a distinct type', function () {
+    $html = <<<HTML
+        <!DOCTYPE html>
+        <html lang="de-AT">
+        <head>
+        <title>Hello world</title>
+        </head>
+        <body>
+        <script type="application/ld+json">
+        {
+            "@context": "http://schema.org",
+            "@type": ["CreativeWork", "Product"],
+            "name" : "something",
+            "productID": "123abc"
+        }
+        </script>
+        </body>
+        </html>
+        HTML;
+
+    $schemaOrgObjects = SchemaOrg::fromHtml($html);
+
+    expect($schemaOrgObjects)->toBeEmpty();
+});
+
 test('you can pass it a PSR-3 LoggerInterface and it will log an error message for invalid JSON string', function () {
     $scriptBlockContent = <<<INVALIDJSON
         {

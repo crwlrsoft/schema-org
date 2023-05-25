@@ -83,6 +83,12 @@ class SchemaOrg
             return null;
         }
 
+        if (!is_string($json['@type'])) {
+            $this->logger?->warning('Can\'t convert schema.org object with non-string type.');
+
+            return null;
+        }
+
         $className = $this->types->getClassName($json['@type']);
 
         if (!$className) {
