@@ -6,7 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.2.0] - 2022-05-17
+## [0.2.1] - 2023-05-25
+### Fixed
+* If a schema.org object has a non string @type, it is ignored and a warning is logged, if the class has a logger.
+
+## [0.2.0] - 2023-05-17
 ### Added
 * You can now optionally pass a PSR-3 LoggerInterface to the `SchemaOrg` class, so it'll log decoding errors.
 
