@@ -4,10 +4,13 @@ namespace Tests;
 
 use Crwlr\SchemaOrg\SchemaOrg;
 use Psr\Log\LoggerInterface;
+use Spatie\SchemaOrg\AggregateOffer;
 use Spatie\SchemaOrg\Article;
 use Spatie\SchemaOrg\FAQPage;
 use Spatie\SchemaOrg\JobPosting;
+use Spatie\SchemaOrg\Offer;
 use Spatie\SchemaOrg\Organization;
+use Spatie\SchemaOrg\Product;
 
 it('extracts JSON-LD schema.org data from an HTML document', function () {
     $html = <<<HTML
@@ -294,4 +297,84 @@ test('you can pass it a PSR-3 LoggerInterface and it will log an error message f
             '"@type": "Article", name: Some Article, url: https://de.exampl',
         'context' => [],
     ]);
+});
+
+it('can convert graph schema.org objects to spatie class instances', function() {
+    $html = <<<HTML
+        <!DOCTYPE html>
+        <html lang="de-AT">
+        <head>
+        <title>Hello world</title>
+        </head>
+        <body>
+        <script type="application/ld+json">
+        {
+            "@context":"https://schema.org",
+            "@graph":[
+              {
+                 "@type":"Product",
+                 "@id":"https://www.store.com/product/1",
+                 "name":"My Product",
+                 "url":"https://www.store.com/schema/product/1",
+                 "description":"My product description",
+                 "offers":[
+                    {
+                       "@type":"AggregateOffer",
+                       "lowPrice":"19.99",
+                       "highPrice":"25.99",
+                       "offerCount":3,
+                       "priceCurrency":"EUR",
+                       "availability":"http://schema.org/InStock",
+                       "url":"https://www.store.com/my-product",
+                       "itemCondition":"https://schema.org/NewCondition",
+                       "@id":"https://www.store.com/schema/aggregate-offer/1",
+                       "offers":[
+                          {
+                             "@type":"Offer",
+                             "@id":"https://www.store.com/schema/offer/1",
+                             "name":"My Product - Size S",
+                             "url":"https://www.store.com/my-product/?size=s",
+                             "priceSpecification":{
+                                "@type":"PriceSpecification",
+                                "price":"19.99",
+                                "priceCurrency":"EUR"
+                             }
+                          },
+                          {
+                             "@type":"Offer",
+                             "@id":"https://www.store.com/schema/offer/2",
+                             "name":"My Product - Size M",
+                             "url":"https://www.store.com/my-product/?size=m",
+                             "priceSpecification":{
+                                "@type":"PriceSpecification",
+                                "price":"20.99",
+                                "priceCurrency":"EUR"
+                             }
+                          },
+                          {
+                             "@type":"Offer",
+                             "@id":"https://www.store.com/schema/offer/3",
+                             "name":"My Product - Size L",
+                             "url":"https://www.store.com/my-product/?size=l",
+                             "priceSpecification":{
+                                "@type":"PriceSpecification",
+                                "price":"25.99",
+                                "priceCurrency":"EUR"
+                             }
+                          }
+                       ]
+                    }
+                 ]
+              }
+              ]
+           }
+        </script>
+        </body>
+        </html>
+        HTML;
+
+    $schemaOrgObjects = SchemaOrg::fromHtml($html);
+    expect($schemaOrgObjects[0])->toBeInstanceOf(Product::class);
+    expect($schemaOrgObjects[0]->getProperty('offers')[0])->toBeInstanceOf(AggregateOffer::class);
+    expect($schemaOrgObjects[0]->getProperty('offers')[0]->getProperty('offers')[0])->toBeInstanceOf(Offer::class);
 });
