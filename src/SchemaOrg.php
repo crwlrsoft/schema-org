@@ -49,7 +49,13 @@ class SchemaOrg
         foreach ($jsonLdScriptBlocks as $jsonLdScriptBlockElement) {
             $schemaOrgObject = $this->getSchemaOrgObjectFromScriptBlock(new Crawler($jsonLdScriptBlockElement));
 
-            if ($schemaOrgObject) {
+            if (! $schemaOrgObject) {
+                continue;
+            }
+
+            if (is_array($schemaOrgObject)) {
+                $schemaOrgObjects = array_merge($schemaOrgObjects, $schemaOrgObject);
+            } else {
                 $schemaOrgObjects[] = $schemaOrgObject;
             }
         }
@@ -57,7 +63,7 @@ class SchemaOrg
         return $schemaOrgObjects;
     }
 
-    private function getSchemaOrgObjectFromScriptBlock(Crawler $domCrawler): ?BaseType
+    private function getSchemaOrgObjectFromScriptBlock(Crawler $domCrawler): BaseType|array|null
     {
         try {
             $jsonData = Json::stringToArray($domCrawler->text());
@@ -71,7 +77,23 @@ class SchemaOrg
             return null;
         }
 
-        return $this->convertJsonDataToSchemaOrgObject($jsonData);
+        if (! isset($jsonData['@graph'])) {
+            return $this->convertJsonDataToSchemaOrgObject($jsonData);
+        }
+
+        $graphData = $jsonData['@graph'];
+
+        $schemaOrgObjects = [];
+
+        foreach ($graphData as $graphDataItem) {
+            $schemaOrgObject = $this->convertJsonDataToSchemaOrgObject($graphDataItem, true);
+
+            if ($schemaOrgObject) {
+                $schemaOrgObjects[] = $schemaOrgObject;
+            }
+        }
+
+        return $schemaOrgObjects;
     }
 
     /**
@@ -110,8 +132,15 @@ class SchemaOrg
         }
 
         foreach ($json as $key => $value) {
+
             if (is_array($value) && isset($value['@type'])) {
                 $value = $this->convertJsonDataToSchemaOrgObject($value, true);
+            } elseif (is_array($value)) {
+                foreach ($value as $k => $v) {
+                    if (is_array($v) && isset($v['@type'])) {
+                        $value[$k] = $this->convertJsonDataToSchemaOrgObject($v, true);
+                    }
+                }
             }
 
             $object->setProperty($key, $value);
