@@ -299,7 +299,7 @@ test('you can pass it a PSR-3 LoggerInterface and it will log an error message f
     ]);
 });
 
-it('can convert graph schema.org objects to spatie class instances', function() {
+it('converts graph (arrays) of schema.org objects to spatie class instances', function () {
     $html = <<<HTML
         <!DOCTYPE html>
         <html lang="de-AT">
@@ -374,7 +374,10 @@ it('can convert graph schema.org objects to spatie class instances', function() 
         HTML;
 
     $schemaOrgObjects = SchemaOrg::fromHtml($html);
+
     expect($schemaOrgObjects[0])->toBeInstanceOf(Product::class);
+
     expect($schemaOrgObjects[0]->getProperty('offers')[0])->toBeInstanceOf(AggregateOffer::class);
+
     expect($schemaOrgObjects[0]->getProperty('offers')[0]->getProperty('offers')[0])->toBeInstanceOf(Offer::class);
 });
