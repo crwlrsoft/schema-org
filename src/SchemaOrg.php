@@ -63,6 +63,10 @@ class SchemaOrg
         return $schemaOrgObjects;
     }
 
+    /**
+     * @param Crawler $domCrawler
+     * @return BaseType|BaseType[]|null
+     */
     private function getSchemaOrgObjectFromScriptBlock(Crawler $domCrawler): BaseType|array|null
     {
         try {
