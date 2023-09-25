@@ -377,7 +377,17 @@ it('converts graph (arrays) of schema.org objects to spatie class instances', fu
 
     expect($schemaOrgObjects[0])->toBeInstanceOf(Product::class);
 
+    expect($schemaOrgObjects[0]->getProperty('offers'))->toBeArray();
+
+    expect($schemaOrgObjects[0]->getProperty('offers'))->toHaveCount(1);
+
     expect($schemaOrgObjects[0]->getProperty('offers')[0])->toBeInstanceOf(AggregateOffer::class);
 
+    expect($schemaOrgObjects[0]->getProperty('offers')[0]->getProperty('offers'))->toBeArray();
+
+    expect($schemaOrgObjects[0]->getProperty('offers')[0]->getProperty('offers'))->toHaveCount(3);
+
     expect($schemaOrgObjects[0]->getProperty('offers')[0]->getProperty('offers')[0])->toBeInstanceOf(Offer::class);
+
+    expect($schemaOrgObjects[0]->getProperty('offers')[0]->getProperty('offers')[2])->toBeInstanceOf(Offer::class);
 });
