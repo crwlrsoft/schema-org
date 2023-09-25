@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2023-09-25
+### Added
+* Objects in an array with key `@graph` like in this example https://schema.org/Article#eg-0399, can now also be parsed. As well as child objects in an array (see the test case with the graph notation).
+
 ## [0.2.1] - 2023-05-25
 ### Fixed
 * If a schema.org object has a non string @type, it is ignored and a warning is logged, if the class has a logger.

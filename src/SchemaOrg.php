@@ -4,7 +4,6 @@ namespace Crwlr\SchemaOrg;
 
 use Crwlr\Utils\Exceptions\InvalidJsonException;
 use Crwlr\Utils\Json;
-use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Spatie\SchemaOrg\BaseType;
 use Symfony\Component\DomCrawler\Crawler;
@@ -47,17 +46,10 @@ class SchemaOrg
         $schemaOrgObjects = [];
 
         foreach ($jsonLdScriptBlocks as $jsonLdScriptBlockElement) {
-            $schemaOrgObject = $this->getSchemaOrgObjectFromScriptBlock(new Crawler($jsonLdScriptBlockElement));
-
-            if (! $schemaOrgObject) {
-                continue;
-            }
-
-            if (is_array($schemaOrgObject)) {
-                $schemaOrgObjects = array_merge($schemaOrgObjects, $schemaOrgObject);
-            } else {
-                $schemaOrgObjects[] = $schemaOrgObject;
-            }
+            $schemaOrgObjects = array_merge(
+                $schemaOrgObjects,
+                $this->getSchemaOrgObjectsFromScriptBlock(new Crawler($jsonLdScriptBlockElement)),
+            );
         }
 
         return $schemaOrgObjects;
@@ -65,32 +57,52 @@ class SchemaOrg
 
     /**
      * @param Crawler $domCrawler
-     * @return BaseType|BaseType[]|null
+     * @return BaseType[]
      */
-    private function getSchemaOrgObjectFromScriptBlock(Crawler $domCrawler): BaseType|array|null
+    private function getSchemaOrgObjectsFromScriptBlock(Crawler $domCrawler): array
+    {
+        $jsonData = $this->scriptBlockToDataArray($domCrawler);
+
+        if (!$jsonData->isSchemaOrgJsonLdData()) {
+            return [];
+        } elseif ($jsonData->hasGraphKey()) {
+            return $this->getSchemaOrgObjectsFromGraph($jsonData);
+        }
+
+        $schemaOrgObject = $this->convertJsonDataToSchemaOrgObject($jsonData);
+
+        return $schemaOrgObject ? [$schemaOrgObject] : [];
+    }
+
+    private function scriptBlockToDataArray(Crawler $scriptBlockElement): DataArray
     {
         try {
-            $jsonData = Json::stringToArray($domCrawler->text());
+            return DataArray::make(Json::stringToArray($scriptBlockElement->text()));
         } catch (InvalidJsonException) {
-            $snippetWithReducedSpaces = preg_replace('/\s+/', ' ', $domCrawler->text()) ?? $domCrawler->text();
+            $snippetWithReducedSpaces = preg_replace('/\s+/', ' ', $scriptBlockElement->text());
+
+            if ($snippetWithReducedSpaces === null) {
+                $snippetWithReducedSpaces = $scriptBlockElement->text();
+            }
 
             $this->logger?->warning(
                 'Failed to parse content of JSON-LD script block as JSON: ' . substr($snippetWithReducedSpaces, 0, 100)
             );
 
-            return null;
+            return DataArray::make([]);
         }
+    }
 
-        if (! isset($jsonData['@graph'])) {
-            return $this->convertJsonDataToSchemaOrgObject($jsonData);
-        }
-
-        $graphData = $jsonData['@graph'];
-
+    /**
+     * @param DataArray $jsonData
+     * @return BaseType[]
+     */
+    private function getSchemaOrgObjectsFromGraph(DataArray $jsonData): array
+    {
         $schemaOrgObjects = [];
 
-        foreach ($graphData as $graphDataItem) {
-            $schemaOrgObject = $this->convertJsonDataToSchemaOrgObject($graphDataItem, true);
+        foreach ($jsonData->getGraph() as $graphDataItem) {
+            $schemaOrgObject = $this->convertJsonDataToSchemaOrgObject($graphDataItem);
 
             if ($schemaOrgObject) {
                 $schemaOrgObjects[] = $schemaOrgObject;
@@ -100,66 +112,72 @@ class SchemaOrg
         return $schemaOrgObjects;
     }
 
-    /**
-     * @param mixed[] $json
-     */
-    private function convertJsonDataToSchemaOrgObject(array $json, bool $isChild = false): ?BaseType
+    private function convertJsonDataToSchemaOrgObject(DataArray $json): ?BaseType
     {
-        if (!$isChild && !$this->isSchemaOrgJsonLdData($json)) {
+        if (!$json->hasTypeKey()) {
             return null;
         }
 
-        if (!is_string($json['@type'])) {
+        $type = $json->getType();
+
+        if (!is_string($type)) {
             $this->logger?->warning('Can\'t convert schema.org object with non-string type.');
 
             return null;
         }
 
-        $className = $this->types->getClassName($json['@type']);
+        $className = $this->types->getClassName($type);
 
         if (!$className) {
             return null;
         }
 
-        return $this->createObjectFromJson($json, $className);
+        return $this->createObjectFromData($json, $className);
     }
 
-    /**
-     * @param mixed[] $json
-     */
-    private function createObjectFromJson(array $json, string $className): BaseType
+    private function createObjectFromData(DataArray $json, string $className): ?BaseType
     {
-        $object = new $className();
+        $object = $this->createObjectFromClassName($className);
 
-        if (!$object instanceof BaseType) {
-            throw new InvalidArgumentException('Class ' . $className . ' is not a child of the BaseType class.');
-        }
-
-        foreach ($json as $key => $value) {
-
-            if (is_array($value) && isset($value['@type'])) {
-                $value = $this->convertJsonDataToSchemaOrgObject($value, true);
-            } elseif (is_array($value)) {
-                foreach ($value as $k => $v) {
-                    if (is_array($v) && isset($v['@type'])) {
-                        $value[$k] = $this->convertJsonDataToSchemaOrgObject($v, true);
+        if ($object) {
+            foreach ($json as $key => $value) {
+                if ($value instanceof DataArray && $value->hasTypeKey()) {
+                    $value = $this->convertJsonDataToSchemaOrgObject($value);
+                } elseif ($value instanceof DataArray) {
+                    foreach ($value as $k => $v) {
+                        if ($v instanceof DataArray && $v->hasTypeKey()) {
+                            $value->set($k, $this->convertJsonDataToSchemaOrgObject($v));
+                        }
                     }
-                }
-            }
 
-            $object->setProperty($key, $value);
+                    $value = $value->toArray(true);
+                }
+
+                $object->setProperty((string) $key, $value);
+            }
         }
 
         return $object;
     }
 
-    /**
-     * @param mixed[] $data
-     */
-    private function isSchemaOrgJsonLdData(array $data): bool
+    private function createObjectFromClassName(string $className): ?BaseType
     {
-        return isset($data['@context']) &&
-            isset($data['@type']) &&
-            str_contains($data['@context'], 'schema.org');
+        if (!class_exists($className)) {
+            $this->logger?->warning(
+                'Something is wrong, the class ' . $className . ' does not exist.'
+            );
+        }
+
+        $object = new $className();
+
+        if (!$object instanceof BaseType) {
+            $this->logger?->warning(
+                'Something is wrong, the class ' . $className . ' is not an instance of the spatie BaseType class.'
+            );
+
+            return null;
+        }
+
+        return $object;
     }
 }
