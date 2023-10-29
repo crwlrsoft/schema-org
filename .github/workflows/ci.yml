@@ -1,73 +1,64 @@
-name: CI (tests, code style and static analysis)
+name: CI
 
 on: pull_request
 
 jobs:
-    cs:
-        name: PHP CS Fixer
-        runs-on: ubuntu-latest
+  cs:
+    name: PHP CS Fixer
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v2
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-            - name: Install PHP
-              uses: shivammathur/setup-php@v2
-              with:
-                  php-version: '8.0'
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.0'
 
-            - name: Check PHP Version
-              run: php -v
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
 
-            - name: Install dependencies
-              run: composer install --prefer-dist --no-progress --no-suggest
+      - name: Run PHP CS Fixer
+        run: composer cs
 
-            - name: Run PHP CS Fixer
-              run: composer cs
+  tests:
+    name: PestPHP Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-versions: [ '8.0', '8.1', '8.2', '8.3' ]
 
-    tests:
-        name: PestPHP Tests
-        runs-on: ubuntu-latest
-        strategy:
-            matrix:
-                php-versions: ['8.0', '8.1', '8.2']
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v2
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
 
-            - name: Install PHP
-              uses: shivammathur/setup-php@v2
-              with:
-                  php-version: ${{ matrix.php-versions }}
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
 
-            - name: Check PHP Version
-              run: php -v
+      - name: Run tests
+        run: composer test
 
-            - name: Install dependencies
-              run: composer install --prefer-dist --no-progress --no-suggest
+  stan:
+    name: PHPStan
+    runs-on: ubuntu-latest
 
-            - name: Run tests
-              run: composer test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    stan:
-        name: PHPStan
-        runs-on: ubuntu-latest
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.0'
 
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v2
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
 
-            - name: Install PHP
-              uses: shivammathur/setup-php@v2
-              with:
-                  php-version: '8.0'
-
-            - name: Check PHP Version
-              run: php -v
-
-            - name: Install dependencies
-              run: composer install --prefer-dist --no-progress --no-suggest
-
-            - name: Run PHPStan
-              run: composer stan
+      - name: Run PHPStan
+        run: composer stan
