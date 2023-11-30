@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.1] - 2023-11-30
+### Fixed
+* Support usage with the new Symfony major version v7.
+
 ## [0.3.0] - 2023-09-25
 ### Added
 * Objects in an array with key `@graph` like in this example https://schema.org/Article#eg-0399, can now also be parsed. As well as child objects in an array (see the test case with the graph notation).
