@@ -25,6 +25,12 @@
         "source": "https://github.com/crwlrsoft/schema-org",
         "docs": "https://www.crwlr.software/packages/schema-org"
     },
+    "funding": [
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/otsch"
+        }
+    ],
     "autoload": {
         "psr-4": {
             "Crwlr\\SchemaOrg\\": "src/"
@@ -37,18 +43,18 @@
     },
     "require": {
         "php": "^8.0",
-        "spatie/schema-org": "~3.11.0",
+        "spatie/schema-org": "~3.23.0",
         "symfony/dom-crawler": "^6.0|^7.0",
         "crwlr/utils": "^1.0",
         "psr/log": "^2.0|^3.0"
     },
     "require-dev": {
-        "pestphp/pest": "^1.22",
+        "pestphp/pest": "^1.22|^2.0|^3.0",
         "phpstan/phpstan": "^1.8",
-        "friendsofphp/php-cs-fixer": "^3.11"
+        "friendsofphp/php-cs-fixer": "^3.57"
     },
     "scripts": {
-        "test": "@php vendor/bin/pest",
+        "test": "@php vendor/bin/pest --display-warnings --bail",
         "cs": "@php vendor/bin/php-cs-fixer fix -v --dry-run",
         "cs-fix": "@php vendor/bin/php-cs-fixer fix -v",
         "stan": "@php vendor/bin/phpstan analyse -c phpstan.neon",

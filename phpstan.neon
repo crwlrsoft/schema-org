@@ -3,5 +3,6 @@ parameters:
     paths:
         - src
         - tests
+    reportUnmatchedIgnoredErrors: false
     ignoreErrors:
         - "#^Call to an undefined method Pest\\\\Expectation\\|Pest\\\\Support\\\\Extendable\\:\\:\\S+\\(\\)\\.$#"

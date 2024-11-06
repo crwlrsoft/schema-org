@@ -40,7 +40,7 @@ class SchemaOrg
     public function getFromHtml(string $html): array
     {
         $jsonLdScriptBlocks = (new Crawler($html))->filterXPath(
-            'descendant-or-self::script[@type = \'application/ld+json\']'
+            'descendant-or-self::script[@type = \'application/ld+json\']',
         );
 
         $schemaOrgObjects = [];
@@ -86,7 +86,7 @@ class SchemaOrg
             }
 
             $this->logger?->warning(
-                'Failed to parse content of JSON-LD script block as JSON: ' . substr($snippetWithReducedSpaces, 0, 100)
+                'Failed to parse content of JSON-LD script block as JSON: ' . substr($snippetWithReducedSpaces, 0, 100),
             );
 
             return DataArray::make([]);
@@ -164,7 +164,7 @@ class SchemaOrg
     {
         if (!class_exists($className)) {
             $this->logger?->warning(
-                'Something is wrong, the class ' . $className . ' does not exist.'
+                'Something is wrong, the class ' . $className . ' does not exist.',
             );
         }
 
@@ -172,7 +172,7 @@ class SchemaOrg
 
         if (!$object instanceof BaseType) {
             $this->logger?->warning(
-                'Something is wrong, the class ' . $className . ' is not an instance of the spatie BaseType class.'
+                'Something is wrong, the class ' . $className . ' is not an instance of the spatie BaseType class.',
             );
 
             return null;
