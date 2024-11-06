@@ -237,7 +237,7 @@ test('you can pass it a PSR-3 LoggerInterface and it will log an error message f
         </html>
         HTML;
 
-    $logger = new class () implements LoggerInterface {
+    $logger = new class implements LoggerInterface {
         /**
          * @var array<array<string|string[]>>
          */

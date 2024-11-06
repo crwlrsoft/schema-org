@@ -59,7 +59,7 @@ class TypeListGenerator
                     continue;
                 }
 
-                $className = "Spatie\\SchemaOrg\\" .substr($filename, 0, -4);
+                $className = "Spatie\\SchemaOrg\\" . substr($filename, 0, -4);
 
                 if (
                     class_exists($className) &&

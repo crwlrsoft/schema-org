@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.2] - 2024-11-06
+### Fixed
+* Updated types list from spatie/schema-org v3.23.
+
 ## [0.3.1] - 2023-11-30
 ### Fixed
 * Support usage with the new Symfony major version v7.

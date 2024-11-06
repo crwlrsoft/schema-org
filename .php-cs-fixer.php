@@ -2,17 +2,21 @@
 
 use PhpCsFixer\Config;
 use PhpCsFixer\Finder;
+use PhpCsFixer\Runner\Parallel\ParallelConfigFactory;
 
 $finder = Finder::create()
     ->exclude(['.github', 'bin', 'git-hooks'])
     ->in(__DIR__);
-$config = new Config();
 
-return $config->setFinder($finder)
+return (new Config())
+    ->setFinder($finder)
+    ->setParallelConfig(ParallelConfigFactory::detect())
     ->setRules([
-        '@PSR12' => true,
+        '@PER-CS' => true,
         'strict_param' => true,
         'single_class_element_per_statement' => false,
+        'array_syntax' => ['syntax' => 'short'],
+        'no_unused_imports' => true,
     ])
     ->setRiskyAllowed(true)
     ->setUsingCache(true);
