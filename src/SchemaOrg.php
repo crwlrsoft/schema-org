@@ -63,10 +63,22 @@ class SchemaOrg
     {
         $jsonData = $this->scriptBlockToDataArray($domCrawler);
 
-        if (!$jsonData->isSchemaOrgJsonLdData()) {
-            return [];
-        } elseif ($jsonData->hasGraphKey()) {
+        if ($jsonData->hasGraphKey()) {
             return $this->getSchemaOrgObjectsFromGraph($jsonData);
+        } elseif ($jsonData->isNumericArray()) {
+            $schemaOrgObjects = [];
+
+            foreach ($jsonData->toArray() as $object) {
+                $schemaOrgObject = $this->convertJsonDataToSchemaOrgObject($object);
+
+                if ($schemaOrgObject) {
+                    $schemaOrgObjects[] = $schemaOrgObject;
+                }
+            }
+
+            return $schemaOrgObjects;
+        } elseif (!$jsonData->isSchemaOrgJsonLdData()) {
+            return [];
         }
 
         $schemaOrgObject = $this->convertJsonDataToSchemaOrgObject($jsonData);

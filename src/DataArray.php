@@ -119,4 +119,15 @@ final class DataArray implements Iterator
     {
         return isset($this->data['@graph']);
     }
+
+    public function isNumericArray(): bool
+    {
+        foreach ($this->data as $key => $value) {
+            if (!is_int($key)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

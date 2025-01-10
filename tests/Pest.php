@@ -39,7 +39,14 @@
 |
 */
 
-//function something()
-//{
-//    // ..
-//}
+function helper_dump(mixed $var): void
+{
+    error_log(var_export($var, true));
+}
+
+function helper_dieDump(mixed $var): void
+{
+    error_log(var_export($var, true));
+
+    exit;
+}

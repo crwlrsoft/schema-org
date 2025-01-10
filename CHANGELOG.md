@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.3] - 2025-01-10
+### Fixed
+* Enable reading multiple schema.org objects from a JSON-LD script block containing an array of schema.org objects.
+
 ## [0.3.2] - 2024-11-06
 ### Fixed
 * Updated types list from spatie/schema-org v3.23.

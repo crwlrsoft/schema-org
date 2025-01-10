@@ -8,6 +8,7 @@ use Spatie\SchemaOrg\AggregateOffer;
 use Spatie\SchemaOrg\Article;
 use Spatie\SchemaOrg\FAQPage;
 use Spatie\SchemaOrg\JobPosting;
+use Spatie\SchemaOrg\NewsArticle;
 use Spatie\SchemaOrg\Offer;
 use Spatie\SchemaOrg\Organization;
 use Spatie\SchemaOrg\Product;
@@ -29,6 +30,29 @@ it('extracts JSON-LD schema.org data from an HTML document', function () {
     expect($schemaOrgObjects)->toHaveCount(1);
 
     expect($schemaOrgObjects[0])->toBeInstanceOf(JobPosting::class);
+});
+
+it('gets schema.org objects from an array inside a JSON-LD script block', function () {
+    $html = <<<HTML
+        <!DOCTYPE html>
+        <html lang="de">
+        <head>
+        <title>Foo Bar</title>
+        <script type="application/ld+json">[{"@type":"NewsArticle","@context":"https:\/\/schema.org","articleBody":"Lorem\u202fipsum","articleSection":["politics"],"author":[{"@type":"Person","name":"Christian Olear","url":"https:\/\/www.example.com\/profiles\/christian-olear"}],"dateModified":"2025-01-10T05:00:42.623Z","description":"dolor sit amet","headline":"asdf","alternativeHeadline":"jkl\u00f6"},{"@type":"NewsArticle","@context":"https:\/\/schema.org","articleBody":"Foo bar","articleSection":["science"],"author":[{"@type":"Person","name":"Christian Olear","url":"https:\/\/www.example.com\/profiles\/christian-olear"}],"dateModified":"2025-01-10T05:03:12.623Z","description":"pew pew pew","headline":"pew pew","alternativeHeadline":"pew"}]</script>
+        </head>
+        <body>
+        <h1>Foo</h1> <p>content</p>
+        </body>
+        </html>
+        HTML;
+
+    $schemaOrgObjects = SchemaOrg::fromHtml($html);
+
+    expect($schemaOrgObjects)->toHaveCount(2)
+        ->and($schemaOrgObjects[0])->toBeInstanceOf(NewsArticle::class)
+        ->and($schemaOrgObjects[0]->getProperty('articleBody'))->toBe('Lorem ipsum')
+        ->and($schemaOrgObjects[1])->toBeInstanceOf(NewsArticle::class)
+        ->and($schemaOrgObjects[1]->getProperty('articleBody'))->toBe('Foo bar');;
 });
 
 it('extracts multiple JSON-LD schema.org items from one document in head and body', function () {
