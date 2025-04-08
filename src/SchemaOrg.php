@@ -113,8 +113,19 @@ class SchemaOrg
     {
         $schemaOrgObjects = [];
 
-        foreach ($jsonData->getGraph() as $graphDataItem) {
-            $schemaOrgObject = $this->convertJsonDataToSchemaOrgObject($graphDataItem);
+        if ($jsonData->getGraph()->isNumericArray()) {
+            foreach ($jsonData->getGraph() as $graphDataItem) {
+                $schemaOrgObject = $this->convertJsonDataToSchemaOrgObject($graphDataItem);
+
+                if ($schemaOrgObject) {
+                    $schemaOrgObjects[] = $schemaOrgObject;
+                }
+            }
+        } else {
+            // When someone provides a structure where the @graph key contains a single object
+            // instead of an array of objects, it should still work. See issue:
+            // https://github.com/crwlrsoft/schema-org/issues/7
+            $schemaOrgObject = $this->convertJsonDataToSchemaOrgObject($jsonData->getGraph());
 
             if ($schemaOrgObject) {
                 $schemaOrgObjects[] = $schemaOrgObject;

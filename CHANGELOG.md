@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.4] - 2025-04-08
+### Fixed
+* An error when a `@graph` property contains only a single object instead of an array of objects. See issue: https://github.com/crwlrsoft/schema-org/issues/7
+
 ## [0.3.3] - 2025-01-10
 ### Fixed
 * Enable reading multiple schema.org objects from a JSON-LD script block containing an array of schema.org objects.
