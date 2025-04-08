@@ -6,6 +6,7 @@ use Crwlr\SchemaOrg\SchemaOrg;
 use Psr\Log\LoggerInterface;
 use Spatie\SchemaOrg\AggregateOffer;
 use Spatie\SchemaOrg\Article;
+use Spatie\SchemaOrg\Dataset;
 use Spatie\SchemaOrg\FAQPage;
 use Spatie\SchemaOrg\JobPosting;
 use Spatie\SchemaOrg\NewsArticle;
@@ -27,9 +28,8 @@ it('extracts JSON-LD schema.org data from an HTML document', function () {
 
     $schemaOrgObjects = SchemaOrg::fromHtml($html);
 
-    expect($schemaOrgObjects)->toHaveCount(1);
-
-    expect($schemaOrgObjects[0])->toBeInstanceOf(JobPosting::class);
+    expect($schemaOrgObjects)->toHaveCount(1)
+        ->and($schemaOrgObjects[0])->toBeInstanceOf(JobPosting::class);
 });
 
 it('gets schema.org objects from an array inside a JSON-LD script block', function () {
@@ -52,7 +52,8 @@ it('gets schema.org objects from an array inside a JSON-LD script block', functi
         ->and($schemaOrgObjects[0])->toBeInstanceOf(NewsArticle::class)
         ->and($schemaOrgObjects[0]->getProperty('articleBody'))->toBe('Lorem ipsum')
         ->and($schemaOrgObjects[1])->toBeInstanceOf(NewsArticle::class)
-        ->and($schemaOrgObjects[1]->getProperty('articleBody'))->toBe('Foo bar');;
+        ->and($schemaOrgObjects[1]->getProperty('articleBody'))->toBe('Foo bar');
+    ;
 });
 
 it('extracts multiple JSON-LD schema.org items from one document in head and body', function () {
@@ -126,13 +127,10 @@ it('extracts multiple JSON-LD schema.org items from one document in head and bod
 
     $schemaOrgObjects = SchemaOrg::fromHtml($html);
 
-    expect($schemaOrgObjects)->toHaveCount(3);
-
-    expect($schemaOrgObjects[0])->toBeInstanceOf(FAQPage::class);
-
-    expect($schemaOrgObjects[1])->toBeInstanceOf(Organization::class);
-
-    expect($schemaOrgObjects[2])->toBeInstanceOf(Article::class);
+    expect($schemaOrgObjects)->toHaveCount(3)
+        ->and($schemaOrgObjects[0])->toBeInstanceOf(FAQPage::class)
+        ->and($schemaOrgObjects[1])->toBeInstanceOf(Organization::class)
+        ->and($schemaOrgObjects[2])->toBeInstanceOf(Article::class);
 });
 
 it('also converts child schema.org objects to spatie class instances', function () {
@@ -178,11 +176,9 @@ it('also converts child schema.org objects to spatie class instances', function 
 
     $schemaOrgObjects = SchemaOrg::fromHtml($html);
 
-    expect($schemaOrgObjects[0])->toBeInstanceOf(Article::class);
-
-    expect($schemaOrgObjects[0]->getProperty('publisher'))->toBeInstanceOf(Organization::class);
-
-    expect($schemaOrgObjects[0]->getProperty('publisher')->getProperty('name'))->toBe('Some Organization, Inc.');
+    expect($schemaOrgObjects[0])->toBeInstanceOf(Article::class)
+        ->and($schemaOrgObjects[0]->getProperty('publisher'))->toBeInstanceOf(Organization::class)
+        ->and($schemaOrgObjects[0]->getProperty('publisher')->getProperty('name'))->toBe('Some Organization, Inc.');
 });
 
 test('there is no error if a json-ld script block contains an invalid JSON string', function () {
@@ -399,19 +395,97 @@ it('converts graph (arrays) of schema.org objects to spatie class instances', fu
 
     $schemaOrgObjects = SchemaOrg::fromHtml($html);
 
-    expect($schemaOrgObjects[0])->toBeInstanceOf(Product::class);
+    expect($schemaOrgObjects[0])->toBeInstanceOf(Product::class)
+        ->and($schemaOrgObjects[0]->getProperty('offers'))->toBeArray()
+        ->and($schemaOrgObjects[0]->getProperty('offers'))->toHaveCount(1)
+        ->and($schemaOrgObjects[0]->getProperty('offers')[0])->toBeInstanceOf(AggregateOffer::class)
+        ->and($schemaOrgObjects[0]->getProperty('offers')[0]->getProperty('offers'))->toBeArray()
+        ->and($schemaOrgObjects[0]->getProperty('offers')[0]->getProperty('offers'))->toHaveCount(3)
+        ->and($schemaOrgObjects[0]->getProperty('offers')[0]->getProperty('offers')[0])->toBeInstanceOf(Offer::class)
+        ->and($schemaOrgObjects[0]->getProperty('offers')[0]->getProperty('offers')[2])->toBeInstanceOf(Offer::class);
+});
 
-    expect($schemaOrgObjects[0]->getProperty('offers'))->toBeArray();
+it('works correctly when the @graph property contains only a single object instead of an array', function () {
+    $html = <<<HTML
+        <!DOCTYPE html>
+        <html lang="de-AT">
+        <head>
+        <title>Hello world</title>
+        </head>
+        <body>
+        <script type="application/ld+json">
+        {
+            "@context": ["https://schema.org", {
+                "csvw": "http://www.w3.org/ns/csvw#"
+            }],
+            "@graph": {
+                "@type": "Dataset",
+                "@id": "https://www.example.com/#/schema/DataSet/example.com/1",
+                "name": "Example",
+                "description": "Staafdiagram met de review-gegevens van Example, namens Example.",
+                "publisher": {
+                    "@id": "https://www.example.com/#/schema/Organization/1"
+                },
+                "about": {
+                    "@id": "https://www.example.com/#/schema/Organization/example.com"
+                },
+                "mainEntity": {
+                    "@type": "csvw:Table",
+                    "csvw:tableSchema": {
+                        "csvw:columns": [{
+                            "csvw:name": "1 ster",
+                            "csvw:datatype": "integer",
+                            "csvw:cells": [{
+                                "csvw:value": "50510",
+                                "csvw:notes": ["15%"]
+                            }]
+                        }, {
+                            "csvw:name": "2 sterren",
+                            "csvw:datatype": "integer",
+                            "csvw:cells": [{
+                                "csvw:value": "9167",
+                                "csvw:notes": ["3%"]
+                            }]
+                        }, {
+                            "csvw:name": "3 sterren",
+                            "csvw:datatype": "integer",
+                            "csvw:cells": [{
+                                "csvw:value": "12156",
+                                "csvw:notes": ["4%"]
+                            }]
+                        }, {
+                            "csvw:name": "4 sterren",
+                            "csvw:datatype": "integer",
+                            "csvw:cells": [{
+                                "csvw:value": "26663",
+                                "csvw:notes": ["8%"]
+                            }]
+                        }, {
+                            "csvw:name": "5 sterren",
+                            "csvw:datatype": "integer",
+                            "csvw:cells": [{
+                                "csvw:value": "238733",
+                                "csvw:notes": ["70%"]
+                            }]
+                        }, {
+                            "csvw:name": "Totaal",
+                            "csvw:datatype": "integer",
+                            "csvw:cells": [{
+                                "csvw:value": "337229",
+                                "csvw:notes": ["100%"]
+                            }]
+                        }]
+                    }
+                }
+            }
+        }
+        </script>
+        </body>
+        </html>
+        HTML;
 
-    expect($schemaOrgObjects[0]->getProperty('offers'))->toHaveCount(1);
+    $schemaOrgObjects = SchemaOrg::fromHtml($html);
 
-    expect($schemaOrgObjects[0]->getProperty('offers')[0])->toBeInstanceOf(AggregateOffer::class);
-
-    expect($schemaOrgObjects[0]->getProperty('offers')[0]->getProperty('offers'))->toBeArray();
-
-    expect($schemaOrgObjects[0]->getProperty('offers')[0]->getProperty('offers'))->toHaveCount(3);
-
-    expect($schemaOrgObjects[0]->getProperty('offers')[0]->getProperty('offers')[0])->toBeInstanceOf(Offer::class);
-
-    expect($schemaOrgObjects[0]->getProperty('offers')[0]->getProperty('offers')[2])->toBeInstanceOf(Offer::class);
+    expect($schemaOrgObjects[0])->toBeInstanceOf(Dataset::class)
+        ->and($schemaOrgObjects[0]->getProperty('name'))->toBe('Example');
 });
