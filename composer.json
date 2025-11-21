@@ -49,8 +49,8 @@
         "psr/log": "^2.0|^3.0"
     },
     "require-dev": {
-        "pestphp/pest": "^1.22|^2.0|^3.0",
-        "phpstan/phpstan": "^1.8",
+        "pestphp/pest": "^1.22|^2.0|^3.0|^4.0",
+        "phpstan/phpstan": "^1.8|^2.0",
         "friendsofphp/php-cs-fixer": "^3.57"
     },
     "scripts": {
