@@ -28,8 +28,8 @@ it('extracts JSON-LD schema.org data from an HTML document', function () {
 
     $schemaOrgObjects = SchemaOrg::fromHtml($html);
 
-    expect($schemaOrgObjects)->toHaveCount(1)
-        ->and($schemaOrgObjects[0])->toBeInstanceOf(JobPosting::class);
+    expect($schemaOrgObjects)->toHaveCount(1)->
+        and($schemaOrgObjects[0])->toBeInstanceOf(JobPosting::class);
 });
 
 it('gets schema.org objects from an array inside a JSON-LD script block', function () {
@@ -48,11 +48,11 @@ it('gets schema.org objects from an array inside a JSON-LD script block', functi
 
     $schemaOrgObjects = SchemaOrg::fromHtml($html);
 
-    expect($schemaOrgObjects)->toHaveCount(2)
-        ->and($schemaOrgObjects[0])->toBeInstanceOf(NewsArticle::class)
-        ->and($schemaOrgObjects[0]->getProperty('articleBody'))->toBe('Lorem ipsum')
-        ->and($schemaOrgObjects[1])->toBeInstanceOf(NewsArticle::class)
-        ->and($schemaOrgObjects[1]->getProperty('articleBody'))->toBe('Foo bar');
+    expect($schemaOrgObjects)->toHaveCount(2)->
+        and($schemaOrgObjects[0])->toBeInstanceOf(NewsArticle::class)->
+        and($schemaOrgObjects[0]->getProperty('articleBody'))->toBe('Lorem ipsum')->
+        and($schemaOrgObjects[1])->toBeInstanceOf(NewsArticle::class)->
+        and($schemaOrgObjects[1]->getProperty('articleBody'))->toBe('Foo bar');
     ;
 });
 
@@ -127,10 +127,10 @@ it('extracts multiple JSON-LD schema.org items from one document in head and bod
 
     $schemaOrgObjects = SchemaOrg::fromHtml($html);
 
-    expect($schemaOrgObjects)->toHaveCount(3)
-        ->and($schemaOrgObjects[0])->toBeInstanceOf(FAQPage::class)
-        ->and($schemaOrgObjects[1])->toBeInstanceOf(Organization::class)
-        ->and($schemaOrgObjects[2])->toBeInstanceOf(Article::class);
+    expect($schemaOrgObjects)->toHaveCount(3)->
+        and($schemaOrgObjects[0])->toBeInstanceOf(FAQPage::class)->
+        and($schemaOrgObjects[1])->toBeInstanceOf(Organization::class)->
+        and($schemaOrgObjects[2])->toBeInstanceOf(Article::class);
 });
 
 it('also converts child schema.org objects to spatie class instances', function () {
@@ -176,9 +176,9 @@ it('also converts child schema.org objects to spatie class instances', function 
 
     $schemaOrgObjects = SchemaOrg::fromHtml($html);
 
-    expect($schemaOrgObjects[0])->toBeInstanceOf(Article::class)
-        ->and($schemaOrgObjects[0]->getProperty('publisher'))->toBeInstanceOf(Organization::class)
-        ->and($schemaOrgObjects[0]->getProperty('publisher')->getProperty('name'))->toBe('Some Organization, Inc.');
+    expect($schemaOrgObjects[0])->toBeInstanceOf(Article::class)->
+        and($schemaOrgObjects[0]->getProperty('publisher'))->toBeInstanceOf(Organization::class)->
+        and($schemaOrgObjects[0]->getProperty('publisher')->getProperty('name'))->toBe('Some Organization, Inc.');
 });
 
 test('there is no error if a json-ld script block contains an invalid JSON string', function () {
@@ -395,14 +395,14 @@ it('converts graph (arrays) of schema.org objects to spatie class instances', fu
 
     $schemaOrgObjects = SchemaOrg::fromHtml($html);
 
-    expect($schemaOrgObjects[0])->toBeInstanceOf(Product::class)
-        ->and($schemaOrgObjects[0]->getProperty('offers'))->toBeArray()
-        ->and($schemaOrgObjects[0]->getProperty('offers'))->toHaveCount(1)
-        ->and($schemaOrgObjects[0]->getProperty('offers')[0])->toBeInstanceOf(AggregateOffer::class)
-        ->and($schemaOrgObjects[0]->getProperty('offers')[0]->getProperty('offers'))->toBeArray()
-        ->and($schemaOrgObjects[0]->getProperty('offers')[0]->getProperty('offers'))->toHaveCount(3)
-        ->and($schemaOrgObjects[0]->getProperty('offers')[0]->getProperty('offers')[0])->toBeInstanceOf(Offer::class)
-        ->and($schemaOrgObjects[0]->getProperty('offers')[0]->getProperty('offers')[2])->toBeInstanceOf(Offer::class);
+    expect($schemaOrgObjects[0])->toBeInstanceOf(Product::class)->
+        and($schemaOrgObjects[0]->getProperty('offers'))->toBeArray()->
+        and($schemaOrgObjects[0]->getProperty('offers'))->toHaveCount(1)->
+        and($schemaOrgObjects[0]->getProperty('offers')[0])->toBeInstanceOf(AggregateOffer::class)->
+        and($schemaOrgObjects[0]->getProperty('offers')[0]->getProperty('offers'))->toBeArray()->
+        and($schemaOrgObjects[0]->getProperty('offers')[0]->getProperty('offers'))->toHaveCount(3)->
+        and($schemaOrgObjects[0]->getProperty('offers')[0]->getProperty('offers')[0])->toBeInstanceOf(Offer::class)->
+        and($schemaOrgObjects[0]->getProperty('offers')[0]->getProperty('offers')[2])->toBeInstanceOf(Offer::class);
 });
 
 it('works correctly when the @graph property contains only a single object instead of an array', function () {
@@ -486,6 +486,6 @@ it('works correctly when the @graph property contains only a single object inste
 
     $schemaOrgObjects = SchemaOrg::fromHtml($html);
 
-    expect($schemaOrgObjects[0])->toBeInstanceOf(Dataset::class)
-        ->and($schemaOrgObjects[0]->getProperty('name'))->toBe('Example');
+    expect($schemaOrgObjects[0])->toBeInstanceOf(Dataset::class)->
+        and($schemaOrgObjects[0]->getProperty('name'))->toBe('Example');
 });
