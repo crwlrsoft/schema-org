@@ -42,15 +42,15 @@
         }
     },
     "require": {
-        "php": "^8.0",
-        "spatie/schema-org": "~3.23.0",
-        "symfony/dom-crawler": "^6.0|^7.0|^8.0",
+        "php": "^8.2",
+        "spatie/schema-org": "~4.0.2",
+        "symfony/dom-crawler": "^7.0|^8.0",
         "crwlr/utils": "^1.0",
         "psr/log": "^2.0|^3.0"
     },
     "require-dev": {
-        "pestphp/pest": "^1.22|^2.0|^3.0|^4.0",
-        "phpstan/phpstan": "^1.8|^2.0",
+        "pestphp/pest": "^3.0|^4.0",
+        "phpstan/phpstan": "^2.0",
         "friendsofphp/php-cs-fixer": "^3.57"
     },
     "scripts": {

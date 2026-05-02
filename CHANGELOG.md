@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-05-02
+### Changed
+* __BREAKING__: Dropped support for PHP 8.0 and 8.1.
+* __BREAKING__: Dropped support for usage with symfony/dom-crawler v6.
+* Updated types list from spatie/schema-org v4.0.2.
+* Support for usage with symfony/dom-crawler v8. Thx to [@chr-hertel](https://github.com/chr-hertel)!
+
 ## [0.3.4] - 2025-04-08
 ### Fixed
 * An error when a `@graph` property contains only a single object instead of an array of objects. See issue: https://github.com/crwlrsoft/schema-org/issues/7
